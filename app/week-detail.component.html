@@ -1,0 +1,63 @@
+<div class="row hidden-xs">
+    <div class="col-sm-12 text-center h4">
+        {{week.startDate | date:'d MMM'}} to {{week.endDate | date:'d MMM yy'}}
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+        <div class="thumbnail">
+            <div class="image hidden-xs"><fa [name]="'film'" [size]=5></fa></div>
+            <div class="caption">
+                <div>
+                    <h3>LECTURE(S)</h3>
+                    <div class="list-group">
+                        <a href="{{lecture.url}}" target="_blank" *ngFor="let lecture of (week.lectures | lectureType: 'main')" class="list-group-item">
+                            <h4 class="list-group-item-heading"><fa [name]="'video-camera'"></fa> {{lecture.title}}</h4>
+                            <p class="list-group-item-text">{{lecture.description | descriptionFormatter}} <br/><strong>{{lecture.description | descriptionFormatter: 'lecturer'}}</strong></p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="thumbnail">
+            <div class="image hidden-xs"><fa [name]="'users'" [size]=5></fa></div>
+            <div class="caption">
+                <div>
+                    <h3>SEMINAR</h3>
+                    <div class="list-group">
+                        <a href="{{seminar.url}}" target="_blank" *ngFor="let seminar of week.seminars" class="list-group-item">
+                            <h4 class="list-group-item-heading"><fa [name]="'sign-in'"></fa> {{seminar.title}}</h4>
+                            <p class="list-group-item-text">{{seminar.description | descriptionFormatter}} <br/><strong>{{seminar.description | descriptionFormatter: 'lecturer'}}</strong></p>
+                            <div class="list-group">
+                                <a href="{{assignment.url}}" target="_blank" *ngFor="let assignment of seminar.assignments" class="list-group-item">
+                                    <h4 class="list-group-item-heading"><fa [name]="'check'"></fa> {{assignment.title}}</h4>
+                                    <p class="list-group-item-text">{{assignment.description}}</p>
+                                </a>
+                            </div>
+                        </a>
+                        <!-- Going to have to loop through items in resources treee here: reading lists, pdfs, links to activities -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="thumbnail">
+            <div class="image hidden-xs"><fa [name]="'book'" [size]=5></fa></div>
+            <div class="caption">
+                <div>
+                    <h3>RESOURCES</h3>
+                    <div class="list-group">
+                        <a href="{{lecture.url}}" target="_blank" *ngFor="let lecture of (week.lectures | lectureType: 'supplementary')" class="list-group-item">
+                            <h4 class="list-group-item-heading"><fa [name]="'video-camera'"></fa> {{lecture.title}}</h4>
+                            <p class="list-group-item-text">{{lecture.description | descriptionFormatter}} <br/><strong>{{lecture.description | descriptionFormatter: 'lecturer'}}</strong></p>
+                        </a>
+                        <!-- Going to have to loop through items in resources treee here: reading lists, pdfs, links to activities -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
