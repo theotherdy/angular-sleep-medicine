@@ -1,17 +1,13 @@
-import { Modyule } from './modyule';
 import { Lecture } from './lecture';
 import { Seminar } from './seminar';
 
 
 export class Week {
-    id: string;
+    siteId: string;
+    siteUrl: string;
     name: string;
-    startDate: Date;
-    endDate: Date;
     active: boolean;
-    resourcesUrl: string;
-    
-    modyule: Modyule;  //'Module' is resrved keyword
+    resourcesUrl: string;  //could be used to point to files in Resources
     
     lectures: Lecture[];
     seminars: Seminar[];

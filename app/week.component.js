@@ -17,7 +17,14 @@ var WeekComponent = (function () {
     function WeekComponent() {
     }
     //private _previousModyuleId: string;
+    WeekComponent.prototype.ngOnInit = function () {
+    };
     WeekComponent.prototype.ngOnChanges = function (changes) {
+        var _this = this;
+        this.weekService.getWeeks()
+            .subscribe(function (modyules) {
+            _this.modyules = modyules;
+        }, function (error) { return _this.errorMessage = error; });
         //run through weeks and if none active, set first to active
         console.log(changes);
         if (changes['modyule'] !== undefined) {

@@ -14,13 +14,13 @@ var core_1 = require('@angular/core');
 var ng2_bootstrap_1 = require('ng2-bootstrap/ng2-bootstrap');
 var modyule_service_1 = require('./modyule.service');
 var week_component_1 = require('./week.component');
-var myGlobals = require('./globals');
 var ModyuleComponent = (function () {
     function ModyuleComponent(
         //private router: Router,
         //private routeParams: RouteParams,
         modyuleService) {
         this.modyuleService = modyuleService;
+        this.mode = 'Observable';
     }
     /**
     * Initialise ModyuleComponent
@@ -29,23 +29,32 @@ var ModyuleComponent = (function () {
     */
     ModyuleComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.modyuleService
+        /*this.modyuleService
             .getModyules()
-            .then(function (modyules) {
+            .then(modyules => {
+                this.modyules = modyules;
+                //if (this.routeParams.get('id')){
+                //    let id = this.routeParams.get('id');
+                //    this.selectedModyule = this.getModyule(id);
+                //} else {
+                    //if we're not going to a specific modyule, we need to load up the current modyule
+                    if(myGlobals.currentModyule){
+                        this.selectedModyule = this.getModyule(myGlobals.currentModyule);
+                    } else {
+                        this.selectedModyule = this.modyules[0];  //ie first one in array
+                    }
+                //}
+            });
+                if(myGlobals.currentModyule){
+                    this.selectedModyule = this.getModyule(myGlobals.currentModyule);
+                } else {
+                    this.selectedModyule = this.modyules[0];  //ie first one in array
+                }
+            });*/
+        this.modyuleService.getModyules()
+            .subscribe(function (modyules) {
             _this.modyules = modyules;
-            //if (this.routeParams.get('id')){
-            //    let id = this.routeParams.get('id'); 
-            //    this.selectedModyule = this.getModyule(id);
-            //} else {
-            //if we're not going to a specific modyule, we need to load up the current modyule
-            if (myGlobals.currentModyule) {
-                _this.selectedModyule = _this.getModyule(myGlobals.currentModyule);
-            }
-            else {
-                _this.selectedModyule = _this.modyules[0]; //ie first one in array
-            }
-            //}
-        });
+        }, function (error) { return _this.errorMessage = error; });
     };
     ModyuleComponent.prototype.onSelect = function (modyule) {
         this.selectedModyule = modyule;

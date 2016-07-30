@@ -23,6 +23,9 @@ export class ModyuleComponent implements OnInit {
     error: any;
     modyule: Modyule;
     
+    errorMessage: string;
+    mode = 'Observable';
+    
     constructor(
         //private router: Router,
         //private routeParams: RouteParams,
@@ -35,7 +38,7 @@ export class ModyuleComponent implements OnInit {
     * @todo Deal with no available modyules for this user
     */
     ngOnInit() {
-        this.modyuleService
+        /*this.modyuleService
             .getModyules()
             .then(modyules => {
                 this.modyules = modyules;
@@ -51,6 +54,18 @@ export class ModyuleComponent implements OnInit {
                     }
                 //}
             });
+                if(myGlobals.currentModyule){
+                    this.selectedModyule = this.getModyule(myGlobals.currentModyule);
+                } else {
+                    this.selectedModyule = this.modyules[0];  //ie first one in array
+                }
+            });*/
+        this.modyuleService.getModyules()
+             .subscribe(
+                modyules => {
+                    this.modyules = modyules
+                    },
+               error =>  this.errorMessage = <any>error);
     }
     
     onSelect(modyule: Modyule) { 

@@ -1,11 +1,11 @@
-import { Modyule } from './modyule';
+/**
+ * Represents a Questionmark Perception assessment, linked to from within a Modyule lesson.
+ * 
+ */
 
-export class Assessment {
-    name: string;
-    url:string;
-    startDate: Date;
-    endDate: Date;
-    
-    modyule: Modyule;  //'Module' is resrved keyword
-    
+export class Assessment {  
+    id: string;
+    title: string;
+    description: string;
+    url: string;
 }

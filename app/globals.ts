@@ -5,3 +5,10 @@
 'use strict';
 
 export let currentModyule: string =  null;
+export let entityBrokerBaseUrl: string = "app/"; //will be "https://weblearn.ox.ac.uk/direct/"
+export let baseSitePath: string = "/medsci/p_g/sleep_med"; //will be "https://weblearn.ox.ac.uk/direct/"
+
+export let urlToSpecifyPortal: string = "portal-hierarchy"; //in WL = 'portal-hierarchy/site.json?portalpath='
+export let suffixForTestingOnly: string = ".json"; //in WL = ''  ie no suffix
+
+export let lessonsUrl: string = "lessons/site/"; //in WL = 'portal-hierarchy/site.json?portalpath='

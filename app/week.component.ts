@@ -19,7 +19,23 @@ export class WeekComponent implements OnChanges{
 
     //private _previousModyuleId: string;
 
+    
+
+    ngOnInit() {
+        
+    }
+
+
     ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
+        this.weekService.getWeeks()
+             .subscribe(
+                modyules => {
+                    this.modyules = modyules
+                    },
+               error =>  this.errorMessage = <any>error);
+
+
+
         //run through weeks and if none active, set first to active
         console.log(changes);
         if(changes['modyule'] !== undefined){  //as it will be when this is called at component init

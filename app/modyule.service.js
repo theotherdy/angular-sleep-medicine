@@ -9,44 +9,56 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var mock_modyules_1 = require('./mock-modyules');
+var http_1 = require('@angular/http');
+var modyule_1 = require('./modyule');
+var Observable_1 = require('rxjs/Observable');
+require('./rxjs-operators'); // Add the RxJS Observable operators we need in this app.
+//import { MODYULES } from './mock-modyules';
 var myGlobals = require('./globals');
 var ModyuleService = (function () {
-    function ModyuleService() {
+    function ModyuleService(http) {
+        var _this = this;
+        this.http = http;
+        this.modyulesUrl = myGlobals.entityBrokerBaseUrl + myGlobals.urlToSpecifyPortal + myGlobals.baseSitePath + myGlobals.suffixForTestingOnly;
+        this.getModyuleLessons = function (res) {
+            var body = res.json();
+            var observableBatch = [];
+            var modyulesToReturn = [];
+            var _loop_1 = function(site) {
+                if (site.siteUrl.indexOf('mod') != -1) {
+                    var tempModyule_1 = new modyule_1.Modyule;
+                    tempModyule_1.siteId = site.siteId;
+                    tempModyule_1.sitePath = site.siteUrl;
+                    _this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + site.siteId + '.json')
+                        .map(function (res) { return res.json(); })
+                        .subscribe(function (res) {
+                        tempModyule_1.name = res.lessons_collection[0].lessonTitle;
+                        modyulesToReturn.push(tempModyule_1);
+                    });
+                }
+            };
+            for (var _i = 0, _a = body.subsites; _i < _a.length; _i++) {
+                var site = _a[_i];
+                _loop_1(site);
+            }
+            return modyulesToReturn;
+        };
     }
-    /**
-    * get list of Modyules (sites) from WebLearn
-    *
-    * @todo Deal with edge cases e.g before Week 1 of the modyule or after the end
-    */
     ModyuleService.prototype.getModyules = function () {
-        //let's run through our modules and look at the dates of our weeks
-        //set .currentWeek property of the modyule to the Week.id if it contains a current week - complex thing will be edge cases
-        for (var _i = 0, MODYULES_1 = mock_modyules_1.MODYULES; _i < MODYULES_1.length; _i++) {
-            var modyule = MODYULES_1[_i];
-            modyule.startDate = new Date('2099-12-31T23:59:59.999Z');
-            modyule.endDate = new Date('2000-01-01T00:00:00.000Z');
-            for (var _a = 0, _b = modyule.weeks; _a < _b.length; _a++) {
-                var week = _b[_a];
-                if (week.startDate < modyule.startDate) {
-                    modyule.startDate = week.startDate;
-                }
-                if (week.endDate > modyule.endDate) {
-                    modyule.endDate = week.endDate;
-                }
-            }
-            var currentDate = new Date();
-            if (currentDate >= modyule.startDate && currentDate <= modyule.endDate) {
-                //this is the currentModyule
-                myGlobals.currentModyule = modyule.siteId;
-            }
-        }
-        //Now that we know all the start and end dates
-        return Promise.resolve(mock_modyules_1.MODYULES);
+        return this.http.get(this.modyulesUrl)
+            .map(this.getModyuleLessons)
+            .catch(this.handleError);
+    };
+    ModyuleService.prototype.handleError = function (error) {
+        // In a real world app, we might use a remote logging infrastructure
+        // We'd also dig deeper into the error to get a better message
+        var errMsg = (error.message) ? error.message : error.status ? error.status + " - " + error.statusText : 'Server error';
+        console.error(errMsg); // log to console instead
+        return Observable_1.Observable.throw(errMsg);
     };
     ModyuleService = __decorate([
         core_1.Injectable(), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [http_1.Http])
     ], ModyuleService);
     return ModyuleService;
 }());

@@ -1,4 +1,3 @@
-import { Week } from './week';
 import { Tutor } from './tutor';
 import { Assignment } from './assignment';
 
@@ -8,14 +7,9 @@ export class Seminar {
     title: string;
     description: string;
     url: string;
-    activityUrl: string;
-    readingListUrl: string;
-    resourcesUrl: string;
+    learningOutcomes: string;
+    resourcesUrl: string;  //used to point to files e.g. reading list, pdfs, etc in Resources
     
-    //belongsTo
-    week: Week;
     tutor: Tutor;
-    
-    //hasMany
     assignments: Assignment[];
 }

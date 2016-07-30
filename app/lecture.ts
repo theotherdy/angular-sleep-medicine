@@ -1,6 +1,4 @@
-import { Week } from './week';
 import { Tutor } from './tutor';
-
 
 export class Lecture {  
     id: string;
@@ -8,9 +6,8 @@ export class Lecture {
     description: string;
     type: string; //main or supplementary
     url: string;
-    mobileUrl: string;
     learningOutcomes: string;
+    resourcesUrl: string;  //used to point to files e.g. reading list, pdfs, etc in Resources
     
-    week: Week;
     tutor: Tutor;
 }

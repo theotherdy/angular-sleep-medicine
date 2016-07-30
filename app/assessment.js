@@ -1,3 +1,7 @@
+/**
+ * Represents a Questionmark Perception assessment, linked to from within a Modyule lesson.
+ *
+ */
 "use strict";
 var Assessment = (function () {
     function Assessment() {

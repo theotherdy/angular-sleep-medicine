@@ -4,4 +4,9 @@
  */
 'use strict';
 exports.currentModyule = null;
+exports.entityBrokerBaseUrl = "app/"; //will be "https://weblearn.ox.ac.uk/direct/"
+exports.baseSitePath = "/medsci/p_g/sleep_med"; //will be "https://weblearn.ox.ac.uk/direct/"
+exports.urlToSpecifyPortal = "portal-hierarchy"; //in WL = 'portal-hierarchy/site.json?portalpath='
+exports.suffixForTestingOnly = ".json"; //in WL = ''  ie no suffix
+exports.lessonsUrl = "lessons/site/"; //in WL = 'portal-hierarchy/site.json?portalpath='
 //# sourceMappingURL=globals.js.map

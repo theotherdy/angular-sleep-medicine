@@ -1,8 +1,6 @@
-import { Lecture } from './lecture';
-import { Seminar } from './seminar';
-
 export class Tutor {
     name: string;
+    url: string;  //for more info on this lecturer
     
     lectures: Lecture[];
     seminars: Seminar[];
