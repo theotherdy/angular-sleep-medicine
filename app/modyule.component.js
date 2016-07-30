@@ -53,7 +53,7 @@ var ModyuleComponent = (function () {
             });*/
         this.modyuleService.getModyules()
             .subscribe(function (modyules) {
-            _this.modyules = modyules;
+            _this.modyules = modyules; //these contain only a siteId - need to get name and rest of details separately
         }, function (error) { return _this.errorMessage = error; });
     };
     ModyuleComponent.prototype.onSelect = function (modyule) {

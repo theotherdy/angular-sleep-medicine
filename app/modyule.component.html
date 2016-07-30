@@ -11,8 +11,8 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="simple-dropdown">
                     <li *ngFor="let modyule of modyules" (click)="onSelect(modyule)">
-                        <!--a class="dropdown-item" href="/module/{{modyule.siteId}}" >{{modyule.name}}</a-->
-                        <button class="btn  btn-link dropdown-item" type="button">{{modyule.name}}</button>
+                        <!--button class="btn  btn-link dropdown-item" type="button">{{modyule.name}}</button-->
+                        <button class="btn  btn-link dropdown-item" type="button">{{modyule.siteId}}</button>
                     </li>
                 </ul>
             </li>

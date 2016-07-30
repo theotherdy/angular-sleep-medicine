@@ -17,37 +17,38 @@ require('./rxjs-operators'); // Add the RxJS Observable operators we need in thi
 var myGlobals = require('./globals');
 var ModyuleService = (function () {
     function ModyuleService(http) {
-        var _this = this;
         this.http = http;
         this.modyulesUrl = myGlobals.entityBrokerBaseUrl + myGlobals.urlToSpecifyPortal + myGlobals.baseSitePath + myGlobals.suffixForTestingOnly;
-        this.getModyuleLessons = function (res) {
-            var body = res.json();
-            var observableBatch = [];
-            var modyulesToReturn = [];
-            var _loop_1 = function(site) {
-                if (site.siteUrl.indexOf('mod') != -1) {
-                    var tempModyule_1 = new modyule_1.Modyule;
-                    tempModyule_1.siteId = site.siteId;
-                    tempModyule_1.sitePath = site.siteUrl;
-                    _this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + site.siteId + '.json')
-                        .map(function (res) { return res.json(); })
-                        .subscribe(function (res) {
-                        tempModyule_1.name = res.lessons_collection[0].lessonTitle;
-                        modyulesToReturn.push(tempModyule_1);
-                    });
-                }
-            };
-            for (var _i = 0, _a = body.subsites; _i < _a.length; _i++) {
-                var site = _a[_i];
-                _loop_1(site);
-            }
-            return modyulesToReturn;
-        };
     }
     ModyuleService.prototype.getModyules = function () {
         return this.http.get(this.modyulesUrl)
-            .map(this.getModyuleLessons)
+            .map(this.initialiseModyules)
             .catch(this.handleError);
+    };
+    ModyuleService.prototype.getModyule = function (siteId) {
+        return this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + siteId + '.json')
+            .map(this.getModyuleDetails)
+            .catch(this.handleError);
+    };
+    ModyuleService.prototype.initialiseModyules = function (res) {
+        var body = res.json();
+        var modyulesToReturn = [];
+        for (var _i = 0, _a = body.subsites; _i < _a.length; _i++) {
+            var site = _a[_i];
+            if (site.siteUrl.indexOf('mod') != -1) {
+                var tempModyule = new modyule_1.Modyule;
+                tempModyule.siteId = site.siteId;
+                tempModyule.siteUrl = site.siteUrl;
+                modyulesToReturn.push(tempModyule);
+            }
+        }
+        return modyulesToReturn;
+    };
+    ModyuleService.prototype.getModyuleDetails = function (res) {
+        var body = res.json();
+        var tempModyule = new modyule_1.Modyule;
+        tempModyule.name = body.lessons_collection[0].lessonTitle;
+        return tempModyule;
     };
     ModyuleService.prototype.handleError = function (error) {
         // In a real world app, we might use a remote logging infrastructure

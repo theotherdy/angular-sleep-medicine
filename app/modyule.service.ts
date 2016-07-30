@@ -19,11 +19,48 @@ export class ModyuleService {
     
     getModyules (): Observable<Modyule[]> {
         return this.http.get(this.modyulesUrl)
-            .map(this.getModyuleLessons)
+            .map(this.initialiseModyules)
             .catch(this.handleError);
     }
     
-    private getModyuleLessons = (res: Response) => {  //this is called instance method for defining function (see: http://blog.johnnyreilly.com/2014/04/typescript-instance-methods.html) and is used here so that the this.http below refers to the class not the map callback that calls it in getModyules.
+    
+    getModyule(siteId: string): Observable<Modyule> {
+        return this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + siteId + '.json')
+            .map(this.getModyuleDetails)
+            .catch(this.handleError);
+    }
+
+    
+    private initialiseModyules(res: Response){
+        let body = res.json();
+        let modyulesToReturn = [];
+        for (let site of body.subsites){
+            if(site.siteUrl.indexOf('mod')!=-1){  //ie only add subsites with 'mod' in the name
+                let tempModyule = new Modyule;
+                tempModyule.siteId = site.siteId;
+                tempModyule.siteUrl = site.siteUrl;
+                modyulesToReturn.push(tempModyule);
+            }
+        }
+        return modyulesToReturn;
+    }
+    
+    private getModyuleDetails(res: Response){
+        let body = res.json();
+        let tempModyule = new Modyule;
+        tempModyule.name = body.lessons_collection[0].lessonTitle;
+        return tempModyule;
+    }
+
+    private handleError (error: any) {
+        // In a real world app, we might use a remote logging infrastructure
+        // We'd also dig deeper into the error to get a better message
+        let errMsg = (error.message) ? error.message : error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+        console.error(errMsg); // log to console instead
+        return Observable.throw(errMsg);
+    }
+    
+    /*private getModyuleLessons = (res: Response) => {  //this is called instance method for defining function (see: http://blog.johnnyreilly.com/2014/04/typescript-instance-methods.html) and is used here so that the this.http below refers to the class not the map callback that calls it in getModyules.
         let body = res.json();
         let observableBatch = [];
         let modyulesToReturn = [];
@@ -32,7 +69,7 @@ export class ModyuleService {
             if(site.siteUrl.indexOf('mod')!=-1){  //ie only request stuff from subsites with 'mod' in the name
                 let tempModyule = new Modyule;
                 tempModyule.siteId = site.siteId;
-                tempModyule.sitePath = site.siteUrl;
+                tempModyule.siteUrl = site.siteUrl;
                 
                 this.http.get( myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + site.siteId + '.json')
                     .map((res: Response) => res.json())
@@ -44,15 +81,9 @@ export class ModyuleService {
         }
           
         return modyulesToReturn;
-    }
+    }*/
     
-    private handleError (error: any) {
-        // In a real world app, we might use a remote logging infrastructure
-        // We'd also dig deeper into the error to get a better message
-        let errMsg = (error.message) ? error.message : error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-        console.error(errMsg); // log to console instead
-        return Observable.throw(errMsg);
-    }
+    
 
 
 

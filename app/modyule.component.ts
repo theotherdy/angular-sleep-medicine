@@ -63,7 +63,7 @@ export class ModyuleComponent implements OnInit {
         this.modyuleService.getModyules()
              .subscribe(
                 modyules => {
-                    this.modyules = modyules
+                    this.modyules = modyules   //these contain only a siteId - need to get name and rest of details separately
                     },
                error =>  this.errorMessage = <any>error);
     }

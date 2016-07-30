@@ -12,35 +12,35 @@ var core_1 = require('@angular/core');
 var common_1 = require('@angular/common');
 var ng2_bootstrap_1 = require('ng2-bootstrap/ng2-bootstrap');
 var modyule_1 = require('./modyule');
+var week_service_1 = require('./week.service');
 var week_detail_component_1 = require('./week-detail.component');
 var WeekComponent = (function () {
-    function WeekComponent() {
-    }
     //private _previousModyuleId: string;
+    function WeekComponent(
+        //private router: Router,
+        //private routeParams: RouteParams,
+        weekService) {
+        this.weekService = weekService;
+    }
     WeekComponent.prototype.ngOnInit = function () {
     };
     WeekComponent.prototype.ngOnChanges = function (changes) {
         var _this = this;
-        this.weekService.getWeeks()
-            .subscribe(function (modyules) {
-            _this.modyules = modyules;
-        }, function (error) { return _this.errorMessage = error; });
-        //run through weeks and if none active, set first to active
         console.log(changes);
         if (changes['modyule'] !== undefined) {
             var activeWeekSet = false;
-            for (var _i = 0, _a = changes['modyule'].currentValue.weeks; _i < _a.length; _i++) {
-                var week = _a[_i];
-                var currentDate = new Date();
-                if (currentDate >= week.startDate && currentDate <= week.endDate) {
-                    //this is the current Week
-                    week.active = true;
-                    activeWeekSet = true;
+            //go and get week data for this modyule
+            this.weekService.getWeeks(changes['modyule'].currentValue.siteUrl)
+                .subscribe(function (weeks) {
+                _this.weeks = weeks;
+                for (var _i = 0, _a = _this.weeks; _i < _a.length; _i++) {
+                    var week = _a[_i];
+                    var currentDate = new Date();
                 }
-            }
-            if (!activeWeekSet) {
-                changes['modyule'].currentValue.weeks[0].active = true;
-            }
+                if (!activeWeekSet) {
+                    _this.weeks[0].active = true;
+                }
+            }, function (error) { return _this.errorMessage = error; });
         }
     };
     __decorate([
@@ -54,8 +54,9 @@ var WeekComponent = (function () {
             directives: [week_detail_component_1.WeekDetailComponent, ng2_bootstrap_1.TAB_DIRECTIVES, common_1.CORE_DIRECTIVES],
             changeDetection: core_1.ChangeDetectionStrategy.OnPush,
             styleUrls: ['app/week.component.css'],
+            providers: [week_service_1.WeekService]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [week_service_1.WeekService])
     ], WeekComponent);
     return WeekComponent;
 }());

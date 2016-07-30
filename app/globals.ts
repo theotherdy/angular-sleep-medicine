@@ -6,6 +6,7 @@
 
 export let currentModyule: string =  null;
 export let entityBrokerBaseUrl: string = "app/"; //will be "https://weblearn.ox.ac.uk/direct/"
+export let unneededPartOfUrlForHierarchyCalls: string = "https://weblearn.ox.ac.uk/portal/hierarchy"; //will be "https://weblearn.ox.ac.uk/direct/"
 export let baseSitePath: string = "/medsci/p_g/sleep_med"; //will be "https://weblearn.ox.ac.uk/direct/"
 
 export let urlToSpecifyPortal: string = "portal-hierarchy"; //in WL = 'portal-hierarchy/site.json?portalpath='
