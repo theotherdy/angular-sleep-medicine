@@ -60,10 +60,14 @@ export class ModyuleComponent implements OnInit {
                     this.selectedModyule = this.modyules[0];  //ie first one in array
                 }
             });*/
+        
+        //So, the idea is to call getModyules, get a list of Modyules back then use switchMap to pass those through to the etails bit that will add names!
+    
         this.modyuleService.getModyules()
-             .subscribe(
+            .switchMap(modyules => this.modyuleService.getModyulesDetails(modyules)) 
+            .subscribe(
                 modyules => {
-                    this.modyules = modyules   //these contain only a siteId - need to get name and rest of details separately
+                    this.modyules = modyules  
                     },
                error =>  this.errorMessage = <any>error);
     }

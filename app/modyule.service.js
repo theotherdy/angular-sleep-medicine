@@ -12,6 +12,7 @@ var core_1 = require('@angular/core');
 var http_1 = require('@angular/http');
 var modyule_1 = require('./modyule');
 var Observable_1 = require('rxjs/Observable');
+var Subject_1 = require('rxjs/Subject');
 require('./rxjs-operators'); // Add the RxJS Observable operators we need in this app.
 //import { MODYULES } from './mock-modyules';
 var myGlobals = require('./globals');
@@ -25,10 +26,30 @@ var ModyuleService = (function () {
             .map(this.initialiseModyules)
             .catch(this.handleError);
     };
-    ModyuleService.prototype.getModyule = function (siteId) {
-        return this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + siteId + '.json')
-            .map(this.getModyuleDetails)
-            .catch(this.handleError);
+    ModyuleService.prototype.getModyulesDetails = function (modyules) {
+        var calls = [];
+        for (var _i = 0, modyules_1 = modyules; _i < modyules_1.length; _i++) {
+            var modyule = modyules_1[_i];
+            calls.push(this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + modyule.siteId + '.json'));
+        }
+        var subject = new Subject_1.Subject(); //see: http://stackoverflow.com/a/38668416/2235210 for why Subject   
+        Observable_1.Observable.forkJoin(calls).subscribe(function (res) {
+            var _loop_1 = function(response) {
+                //Note this is a really very awkward way of matching modyule with a siteId assigned in getModyules (above) with the correct response from forkJoin (could come back in any order), by looking at the requested url from the response object
+                var foundModyule = modyules.find(function (modyule) {
+                    var modyuleUrl = myGlobals.entityBrokerBaseUrlForLocalOnly + myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + modyule.siteId + '.json';
+                    return modyuleUrl === response.url;
+                });
+                var bodyAsJson = JSON.parse(response._body);
+                foundModyule.name = bodyAsJson.lessons_collection[0].lessonTitle;
+            };
+            for (var _i = 0, res_1 = res; _i < res_1.length; _i++) {
+                var response = res_1[_i];
+                _loop_1(response);
+            }
+            subject.next(modyules);
+        });
+        return subject;
     };
     ModyuleService.prototype.initialiseModyules = function (res) {
         var body = res.json();
@@ -43,12 +64,6 @@ var ModyuleService = (function () {
             }
         }
         return modyulesToReturn;
-    };
-    ModyuleService.prototype.getModyuleDetails = function (res) {
-        var body = res.json();
-        var tempModyule = new modyule_1.Modyule;
-        tempModyule.name = body.lessons_collection[0].lessonTitle;
-        return tempModyule;
     };
     ModyuleService.prototype.handleError = function (error) {
         // In a real world app, we might use a remote logging infrastructure

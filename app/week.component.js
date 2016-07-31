@@ -26,11 +26,12 @@ var WeekComponent = (function () {
     };
     WeekComponent.prototype.ngOnChanges = function (changes) {
         var _this = this;
-        console.log(changes);
+        //console.log(changes);
         if (changes['modyule'] !== undefined) {
             var activeWeekSet = false;
             //go and get week data for this modyule
             this.weekService.getWeeks(changes['modyule'].currentValue.siteUrl)
+                .switchMap(function (weeks) { return _this.weekService.getWeeksDetails(weeks); })
                 .subscribe(function (weeks) {
                 _this.weeks = weeks;
                 for (var _i = 0, _a = _this.weeks; _i < _a.length; _i++) {

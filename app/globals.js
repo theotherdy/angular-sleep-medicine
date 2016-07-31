@@ -5,6 +5,7 @@
 'use strict';
 exports.currentModyule = null;
 exports.entityBrokerBaseUrl = "app/"; //will be "https://weblearn.ox.ac.uk/direct/"
+exports.entityBrokerBaseUrlForLocalOnly = "http://localhost:3000/"; //search and remove on live
 exports.unneededPartOfUrlForHierarchyCalls = "https://weblearn.ox.ac.uk/portal/hierarchy"; //will be "https://weblearn.ox.ac.uk/direct/"
 exports.baseSitePath = "/medsci/p_g/sleep_med"; //will be "https://weblearn.ox.ac.uk/direct/"
 exports.urlToSpecifyPortal = "portal-hierarchy"; //in WL = 'portal-hierarchy/site.json?portalpath='

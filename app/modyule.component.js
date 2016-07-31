@@ -28,7 +28,6 @@ var ModyuleComponent = (function () {
     * @todo Deal with no available modyules for this user
     */
     ModyuleComponent.prototype.ngOnInit = function () {
-        var _this = this;
         /*this.modyuleService
             .getModyules()
             .then(modyules => {
@@ -51,9 +50,12 @@ var ModyuleComponent = (function () {
                     this.selectedModyule = this.modyules[0];  //ie first one in array
                 }
             });*/
+        var _this = this;
+        //So, the idea is to call getModyules, get a list of Modyules back then use switchMap to pass those through to the etails bit that will add names!
         this.modyuleService.getModyules()
+            .switchMap(function (modyules) { return _this.modyuleService.getModyulesDetails(modyules); })
             .subscribe(function (modyules) {
-            _this.modyules = modyules; //these contain only a siteId - need to get name and rest of details separately
+            _this.modyules = modyules;
         }, function (error) { return _this.errorMessage = error; });
     };
     ModyuleComponent.prototype.onSelect = function (modyule) {

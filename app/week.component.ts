@@ -40,29 +40,29 @@ export class WeekComponent implements OnChanges{
 
 
     ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-        console.log(changes);
+        //console.log(changes);
         if(changes['modyule'] !== undefined){  //as it will be when this is called at component init
             var activeWeekSet = false;
-            
             //go and get week data for this modyule
             this.weekService.getWeeks(changes['modyule'].currentValue.siteUrl)
-             .subscribe(
-                weeks => {
-                    this.weeks = weeks;
-                    for(var week of this.weeks){
-                        let currentDate: Date = new Date();
-                        //if(currentDate >= week.startDate && currentDate <= week.endDate){
-                            //this is the current Week
-                            //week.active = true;
-                            //activeWeekSet = true;
-                        //}
-                    }
-                    if(!activeWeekSet){
-                        this.weeks[0].active = true;
-                    }
-                },
-                error =>  this.errorMessage = <any>error);
+                .switchMap(weeks => this.weekService.getWeeksDetails(weeks)) 
+                .subscribe(
+                    weeks => {
+                        this.weeks = weeks;
+                        for(var week of this.weeks){
+                            let currentDate: Date = new Date();
+                            //if(currentDate >= week.startDate && currentDate <= week.endDate){
+                                //this is the current Week
+                                //week.active = true;
+                                //activeWeekSet = true;
+                            //}
+                        }
+                        if(!activeWeekSet){
+                            this.weeks[0].active = true;
+                        }
+                    },
+                    error =>  this.errorMessage = <any>error
+                );
         }
     }
-
 }
