@@ -87,13 +87,7 @@
             <div class="caption">
                 <div>
                     <h3>RESOURCES</h3>
-                    <div class="list-group">
-                        <!--a href="{{lecture.url}}" target="_blank" *ngFor="let lecture of (week.lectures | lectureType: 'supplementary')" class="list-group-item">
-                            <h4 class="list-group-item-heading"><fa [name]="'video-camera'"></fa> {{lecture.title}}</h4>
-                            <p class="list-group-item-text">{{lecture.description | descriptionFormatter}} <br/><strong>{{lecture.description | descriptionFormatter: 'lecturer'}}</strong></p>
-                        </a-->
-                        <!-- Going to have to loop through items in resources treee here: reading lists, pdfs, links to activities -->
-                    </div>
+                    <modyule-resource-component [modyule]="week.modyule"></modyule-resource-component>
                 </div>
             </div>
         </div>

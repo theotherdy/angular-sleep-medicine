@@ -9,9 +9,10 @@ export class Modyule {  //'Module' is reserved keyword
     startDate: Date;
     endDate: Date;
     currentModyule: boolean;
+    lessonUrl: string;
     resourcesUrl: string;  //could be used to point to files in Resources
     
     weeks: Week[];
-    supplemtaryLectures: Lecture[];  //letures where type = supplementary
+    supplementaryLectures: Lecture[];  //letures where type = supplementary
     assessments: Assessment[];
 }

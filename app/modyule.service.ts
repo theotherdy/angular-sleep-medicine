@@ -4,6 +4,8 @@ import { Http, Response } from '@angular/http';
 import { Modyule } from './modyule';
 import { Observable }     from 'rxjs/Observable';
 import { Subject }     from 'rxjs/Subject';
+import { Lecture } from './lecture';
+import { Resource } from './resource';
 
 import './rxjs-operators';  // Add the RxJS Observable operators we need in this app.
 
@@ -48,6 +50,8 @@ export class ModyuleService {
                 let bodyAsJson = JSON.parse(response._body);
                 if(response.url.indexOf(myGlobals.lessonsUrl)!=-1){ //getting lessons
                     foundModyule.name = bodyAsJson.lessons_collection[0].lessonTitle;
+                    foundModyule.lessonUrl = bodyAsJson.lessons_collection[0].contentsURL;
+                    //foundModyule.name = bodyAsJson.lessons_collection[0].lessonTitle;
                 } else if (response.url.indexOf(myGlobals.contentUrl)!=-1){ //getting resources){
                     //find folder caled Start date and get the date from its description
                     let startFolder = bodyAsJson.content_collection[0].resourceChildren.find(folder=> {
@@ -63,6 +67,18 @@ export class ModyuleService {
         
         return subject;
     }
+
+    /**
+    * For modyules-resources component to get details of the materials inside it
+    */
+
+    getModyuleLesson(modyule: Modyule): Observable<Modyule>{  
+        let lessonUrl = modyule.lessonUrl.replace(myGlobals.unneededPartOfUrlForLessonCalls, '');
+        return this.http.get(myGlobals.entityBrokerBaseUrl+lessonUrl + '.json')
+            .cache()
+            .map(this.processLessons)
+            .catch(this.handleError);        
+        }
     
     private initialiseModyules(res: Response){
         let body = res.json();
@@ -76,6 +92,47 @@ export class ModyuleService {
             }
         }
         return modyulesToReturn;
+    }
+
+    private processLessons(res: Response){
+        let modyuleToReturn: Modyule = new Modyule;
+        let body = res.json();
+        //first deal with lectures
+        let lecturesPage = body.contentsList.find(subPage=> {
+            return subPage.name.toLowerCase() === 'lectures';
+            });
+        modyuleToReturn.supplementaryLectures = new Array<Lecture>();
+        for(let lectureData of lecturesPage.contentsList){
+            let lecture: Lecture = new Lecture;
+            lecture.type = 'main'; //because it's within a week
+            lecture.name = lectureData.name; 
+            lecture.id = lectureData.id;
+            for (let lectureDetail of lectureData.contentsList){
+                if(lectureDetail.name.toLowerCase()=='lecture link'){
+                    lecture.url = lectureDetail.url;
+                } else if (lectureDetail.name.toLowerCase()=='learning outcomes'){
+                    lecture.learningOutcomesUrl = lectureDetail.contentsURL;
+                } else if (lectureDetail.type == 5){
+                    if(lectureDetail.html.indexOf('data-directory')==-1){
+                        //standard html text content - assuming the lecture description
+                        lecture.description = lectureDetail.html;
+                    } else {
+                        //link to a resources folder
+                        //extract the url from the .html property: data-directory='\/group\/c3254610-b325-4a0c-8d1a-c817099eb5fe\/\/Lecture 1\/'
+                        let posDataDirectory = lectureDetail.html.indexOf("data-directory");
+                        let posFirstApostrophe = lectureDetail.html.indexOf("'",posDataDirectory);
+                        let posLastApostrophe = lectureDetail.html.indexOf("'",posFirstApostrophe+1);
+                        lecture.resourcesUrl = lectureDetail.html.substr(posFirstApostrophe+1,posLastApostrophe-posFirstApostrophe-1);
+                        if(lecture.resourcesUrl.charAt(lecture.resourcesUrl.length - 1)=="/"){  //to remove final '/' if present
+                            lecture.resourcesUrl = lecture.resourcesUrl.substring(0, lecture.resourcesUrl.length - 1);
+                        }
+                    }
+                } 
+            }
+        modyuleToReturn.supplementaryLectures.push(lecture);   
+        }
+                
+        return modyuleToReturn;
     }
     
     private handleError (error: any) {

@@ -13,10 +13,12 @@ import { DescriptionFormatterPipe } from './description-formatter.pipe';
 import { WeekService } from './week.service';
 import { Lecture } from './lecture';
 
+import { ModyuleResourceComponent } from './modyule-resource.component';
+
 @Component({
     selector: 'week-detail-component',
     templateUrl: 'app/week-detail.component.html',
-    directives: [FaComponent,CollapseDirective],
+    directives: [ModyuleResourceComponent,FaComponent,CollapseDirective],
     styleUrls:  ['app/week-detail.component.css'],
     pipes: [LectureTypePipe, DescriptionFormatterPipe],
     providers: [WeekService]
@@ -38,7 +40,6 @@ export class WeekDetailComponent implements OnInit{
     
     ngOnInit() {
         this.lecturesObservable = this.weekService.getWeekLesson(this.week)
-            .cache()
             .map(week=>{
                 this.week.lectures = week.lectures;
                 this.week.seminars = week.seminars;
@@ -46,9 +47,12 @@ export class WeekDetailComponent implements OnInit{
                 return week;
             })
             .switchMap(week => this.weekService.getLecturesDetails(this.week))
-            .cache()
             .map(week=>{
                 this.week.lectures = week.lectures;
+                return week;
+            })
+            .switchMap(week => this.weekService.getSeminarsDetails(this.week))
+            .map(week=>{
                 this.week.seminars = week.seminars;
                 return week;
             });

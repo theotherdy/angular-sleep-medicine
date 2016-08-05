@@ -15,6 +15,7 @@ var week_1 = require('./week');
 var lecture_type_pipe_1 = require('./lecture-type.pipe');
 var description_formatter_pipe_1 = require('./description-formatter.pipe');
 var week_service_1 = require('./week.service');
+var modyule_resource_component_1 = require('./modyule-resource.component');
 var WeekDetailComponent = (function () {
     function WeekDetailComponent(weekService) {
         this.weekService = weekService;
@@ -23,7 +24,6 @@ var WeekDetailComponent = (function () {
     WeekDetailComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.lecturesObservable = this.weekService.getWeekLesson(this.week)
-            .cache()
             .map(function (week) {
             _this.week.lectures = week.lectures;
             _this.week.seminars = week.seminars;
@@ -31,9 +31,12 @@ var WeekDetailComponent = (function () {
             return week;
         })
             .switchMap(function (week) { return _this.weekService.getLecturesDetails(_this.week); })
-            .cache()
             .map(function (week) {
             _this.week.lectures = week.lectures;
+            return week;
+        })
+            .switchMap(function (week) { return _this.weekService.getSeminarsDetails(_this.week); })
+            .map(function (week) {
             _this.week.seminars = week.seminars;
             return week;
         });
@@ -52,7 +55,7 @@ var WeekDetailComponent = (function () {
         core_1.Component({
             selector: 'week-detail-component',
             templateUrl: 'app/week-detail.component.html',
-            directives: [components_1.FaComponent, ng2_bootstrap_1.CollapseDirective],
+            directives: [modyule_resource_component_1.ModyuleResourceComponent, components_1.FaComponent, ng2_bootstrap_1.CollapseDirective],
             styleUrls: ['app/week-detail.component.css'],
             pipes: [lecture_type_pipe_1.LectureTypePipe, description_formatter_pipe_1.DescriptionFormatterPipe],
             providers: [week_service_1.WeekService]

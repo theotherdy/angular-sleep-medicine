@@ -44,6 +44,7 @@ var WeekComponent = (function () {
                         activeWeekSet = true;
                     }
                     startDateOfThisWeek = startDateOfNextWeek;
+                    week.modyule = _this.modyule;
                 }
                 if (!activeWeekSet) {
                     _this.modyule.weeks[0].active = true;

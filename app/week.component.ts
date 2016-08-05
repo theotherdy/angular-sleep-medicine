@@ -74,6 +74,7 @@ export class WeekComponent implements OnChanges{
                             activeWeekSet = true;
                         }
                         startDateOfThisWeek = startDateOfNextWeek;
+                        week.modyule = this.modyule;
                     }
                     if(!activeWeekSet){
                         this.modyule.weeks[0].active = true;

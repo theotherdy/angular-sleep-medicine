@@ -13,6 +13,7 @@ var http_1 = require('@angular/http');
 var modyule_1 = require('./modyule');
 var Observable_1 = require('rxjs/Observable');
 var Subject_1 = require('rxjs/Subject');
+var lecture_1 = require('./lecture');
 require('./rxjs-operators'); // Add the RxJS Observable operators we need in this app.
 //import { MODYULES } from './mock-modyules';
 var myGlobals = require('./globals');
@@ -44,6 +45,7 @@ var ModyuleService = (function () {
                 var bodyAsJson = JSON.parse(response._body);
                 if (response.url.indexOf(myGlobals.lessonsUrl) != -1) {
                     foundModyule.name = bodyAsJson.lessons_collection[0].lessonTitle;
+                    foundModyule.lessonUrl = bodyAsJson.lessons_collection[0].contentsURL;
                 }
                 else if (response.url.indexOf(myGlobals.contentUrl) != -1) {
                     //find folder caled Start date and get the date from its description
@@ -62,6 +64,16 @@ var ModyuleService = (function () {
         });
         return subject;
     };
+    /**
+    * For modyules-resources component to get details of the materials inside it
+    */
+    ModyuleService.prototype.getModyuleLesson = function (modyule) {
+        var lessonUrl = modyule.lessonUrl.replace(myGlobals.unneededPartOfUrlForLessonCalls, '');
+        return this.http.get(myGlobals.entityBrokerBaseUrl + lessonUrl + '.json')
+            .cache()
+            .map(this.processLessons)
+            .catch(this.handleError);
+    };
     ModyuleService.prototype.initialiseModyules = function (res) {
         var body = res.json();
         var modyulesToReturn = [];
@@ -75,6 +87,50 @@ var ModyuleService = (function () {
             }
         }
         return modyulesToReturn;
+    };
+    ModyuleService.prototype.processLessons = function (res) {
+        var modyuleToReturn = new modyule_1.Modyule;
+        var body = res.json();
+        //first deal with lectures
+        var lecturesPage = body.contentsList.find(function (subPage) {
+            return subPage.name.toLowerCase() === 'lectures';
+        });
+        modyuleToReturn.supplementaryLectures = new Array();
+        for (var _i = 0, _a = lecturesPage.contentsList; _i < _a.length; _i++) {
+            var lectureData = _a[_i];
+            var lecture = new lecture_1.Lecture;
+            lecture.type = 'main'; //because it's within a week
+            lecture.name = lectureData.name;
+            lecture.id = lectureData.id;
+            for (var _b = 0, _c = lectureData.contentsList; _b < _c.length; _b++) {
+                var lectureDetail = _c[_b];
+                if (lectureDetail.name.toLowerCase() == 'lecture link') {
+                    lecture.url = lectureDetail.url;
+                }
+                else if (lectureDetail.name.toLowerCase() == 'learning outcomes') {
+                    lecture.learningOutcomesUrl = lectureDetail.contentsURL;
+                }
+                else if (lectureDetail.type == 5) {
+                    if (lectureDetail.html.indexOf('data-directory') == -1) {
+                        //standard html text content - assuming the lecture description
+                        lecture.description = lectureDetail.html;
+                    }
+                    else {
+                        //link to a resources folder
+                        //extract the url from the .html property: data-directory='\/group\/c3254610-b325-4a0c-8d1a-c817099eb5fe\/\/Lecture 1\/'
+                        var posDataDirectory = lectureDetail.html.indexOf("data-directory");
+                        var posFirstApostrophe = lectureDetail.html.indexOf("'", posDataDirectory);
+                        var posLastApostrophe = lectureDetail.html.indexOf("'", posFirstApostrophe + 1);
+                        lecture.resourcesUrl = lectureDetail.html.substr(posFirstApostrophe + 1, posLastApostrophe - posFirstApostrophe - 1);
+                        if (lecture.resourcesUrl.charAt(lecture.resourcesUrl.length - 1) == "/") {
+                            lecture.resourcesUrl = lecture.resourcesUrl.substring(0, lecture.resourcesUrl.length - 1);
+                        }
+                    }
+                }
+            }
+            modyuleToReturn.supplementaryLectures.push(lecture);
+        }
+        return modyuleToReturn;
     };
     ModyuleService.prototype.handleError = function (error) {
         // In a real world app, we might use a remote logging infrastructure
