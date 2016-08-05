@@ -30,18 +30,29 @@ var ModyuleService = (function () {
         var calls = [];
         for (var _i = 0, modyules_1 = modyules; _i < modyules_1.length; _i++) {
             var modyule = modyules_1[_i];
-            calls.push(this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + modyule.siteId + '.json'));
+            calls.push(this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + modyule.siteId + '.json').cache());
+            calls.push(this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.contentUrl + modyule.siteId + '.json').cache());
         }
         var subject = new Subject_1.Subject(); //see: http://stackoverflow.com/a/38668416/2235210 for why Subject   
         Observable_1.Observable.forkJoin(calls).subscribe(function (res) {
             var _loop_1 = function(response) {
                 //Note this is a really very awkward way of matching modyule with a siteId assigned in getModyules (above) with the correct response from forkJoin (could come back in any order), by looking at the requested url from the response object
                 var foundModyule = modyules.find(function (modyule) {
-                    var modyuleUrl = myGlobals.entityBrokerBaseUrlForLocalOnly + myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + modyule.siteId + '.json';
-                    return modyuleUrl === response.url;
+                    //let modyuleUrl = myGlobals.entityBrokerBaseUrlForLocalOnly+myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + modyule.siteId + '.json';
+                    return response.url.indexOf(modyule.siteId) != -1;
                 });
                 var bodyAsJson = JSON.parse(response._body);
-                foundModyule.name = bodyAsJson.lessons_collection[0].lessonTitle;
+                if (response.url.indexOf(myGlobals.lessonsUrl) != -1) {
+                    foundModyule.name = bodyAsJson.lessons_collection[0].lessonTitle;
+                }
+                else if (response.url.indexOf(myGlobals.contentUrl) != -1) {
+                    //find folder caled Start date and get the date from its description
+                    var startFolder = bodyAsJson.content_collection[0].resourceChildren.find(function (folder) {
+                        //let modyuleUrl = myGlobals.entityBrokerBaseUrlForLocalOnly+myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + modyule.siteId + '.json';
+                        return folder.name.toLowerCase() === 'start date';
+                    });
+                    foundModyule.startDate = new Date(startFolder.description);
+                }
             };
             for (var _i = 0, res_1 = res; _i < res_1.length; _i++) {
                 var response = res_1[_i];

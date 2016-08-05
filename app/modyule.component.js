@@ -14,6 +14,7 @@ var core_1 = require('@angular/core');
 var ng2_bootstrap_1 = require('ng2-bootstrap/ng2-bootstrap');
 var modyule_service_1 = require('./modyule.service');
 var week_component_1 = require('./week.component');
+var myGlobals = require('./globals');
 var ModyuleComponent = (function () {
     function ModyuleComponent(
         //private router: Router,
@@ -28,34 +29,34 @@ var ModyuleComponent = (function () {
     * @todo Deal with no available modyules for this user
     */
     ModyuleComponent.prototype.ngOnInit = function () {
-        /*this.modyuleService
-            .getModyules()
-            .then(modyules => {
-                this.modyules = modyules;
-                //if (this.routeParams.get('id')){
-                //    let id = this.routeParams.get('id');
-                //    this.selectedModyule = this.getModyule(id);
-                //} else {
-                    //if we're not going to a specific modyule, we need to load up the current modyule
-                    if(myGlobals.currentModyule){
-                        this.selectedModyule = this.getModyule(myGlobals.currentModyule);
-                    } else {
-                        this.selectedModyule = this.modyules[0];  //ie first one in array
-                    }
-                //}
-            });
-                if(myGlobals.currentModyule){
-                    this.selectedModyule = this.getModyule(myGlobals.currentModyule);
-                } else {
-                    this.selectedModyule = this.modyules[0];  //ie first one in array
-                }
-            });*/
-        var _this = this;
         //So, the idea is to call getModyules, get a list of Modyules back then use switchMap to pass those through to the etails bit that will add names!
+        var _this = this;
         this.modyuleService.getModyules()
+            .map(function (modyules) {
+            //console.log(modyules);
+            return modyules;
+        })
             .switchMap(function (modyules) { return _this.modyuleService.getModyulesDetails(modyules); })
+            .map(function (modyules) {
+            console.log(modyules);
+            return modyules;
+        })
             .subscribe(function (modyules) {
+            //@todo - deal with research modyules seaparately otherwise if two are concurrent, not sure which one will be returned
+            //first sort returned modyules into name order
+            modyules.sort(_this.compareByModyuleDate);
             _this.modyules = modyules;
+            var tempCurrentModyule = modyules[0]; //now they're sorted, this should be the first one
+            var currentDate = new Date();
+            for (var _i = 0, modyules_1 = modyules; _i < modyules_1.length; _i++) {
+                var modyule = modyules_1[_i];
+                if (currentDate > modyule.startDate && modyule.startDate > tempCurrentModyule.startDate) {
+                    tempCurrentModyule = modyule;
+                }
+                //this is the currentModyule
+                myGlobals.currentModyule = tempCurrentModyule;
+                _this.selectedModyule = tempCurrentModyule;
+            }
         }, function (error) { return _this.errorMessage = error; });
     };
     ModyuleComponent.prototype.onSelect = function (modyule) {
@@ -65,6 +66,16 @@ var ModyuleComponent = (function () {
         return this.modyules.filter(function (mod) {
             return (mod.siteId === id);
         })[0]; //ie first [0] in returned array
+    };
+    ModyuleComponent.prototype.compareByModyuleName = function (modyuleA, modyuleB) {
+        return modyuleA.name.localeCompare(modyuleB.name, undefined, { numeric: true, sensitivity: 'base' }); //sort function to naturally sort strings: http://stackoverflow.com/a/38641281/2235210
+    };
+    ModyuleComponent.prototype.compareByModyuleDate = function (modyuleA, modyuleB) {
+        if (modyuleA.startDate < modyuleB.startDate)
+            return -1;
+        if (modyuleA.startDate > modyuleB.startDate)
+            return 1;
+        return 0;
     };
     ModyuleComponent = __decorate([
         core_1.Component({

@@ -38,38 +38,39 @@ export class ModyuleComponent implements OnInit {
     * @todo Deal with no available modyules for this user
     */
     ngOnInit() {
-        /*this.modyuleService
-            .getModyules()
-            .then(modyules => {
-                this.modyules = modyules;
-                //if (this.routeParams.get('id')){
-                //    let id = this.routeParams.get('id'); 
-                //    this.selectedModyule = this.getModyule(id);
-                //} else {
-                    //if we're not going to a specific modyule, we need to load up the current modyule
-                    if(myGlobals.currentModyule){
-                        this.selectedModyule = this.getModyule(myGlobals.currentModyule);
-                    } else {
-                        this.selectedModyule = this.modyules[0];  //ie first one in array
-                    }
-                //}
-            });
-                if(myGlobals.currentModyule){
-                    this.selectedModyule = this.getModyule(myGlobals.currentModyule);
-                } else {
-                    this.selectedModyule = this.modyules[0];  //ie first one in array
-                }
-            });*/
-        
         //So, the idea is to call getModyules, get a list of Modyules back then use switchMap to pass those through to the etails bit that will add names!
     
         this.modyuleService.getModyules()
+            .map(modyules => {
+                    //console.log(modyules);
+                    return modyules;
+                })
             .switchMap(modyules => this.modyuleService.getModyulesDetails(modyules)) 
+            .map(modyules => {
+                    console.log(modyules);
+                    return modyules;
+                })
             .subscribe(
                 modyules => {
-                    this.modyules = modyules  
-                    },
-               error =>  this.errorMessage = <any>error);
+                    //@todo - deal with research modyules seaparately otherwise if two are concurrent, not sure which one will be returned
+                    //first sort returned modyules into name order
+                    modyules.sort(this.compareByModyuleDate);
+
+                    this.modyules = modyules;
+                    
+                    let tempCurrentModyule: Modyule = modyules[0];  //now they're sorted, this should be the first one
+                    let currentDate: Date = new Date();
+                    for (let modyule of modyules){
+                        if(currentDate > modyule.startDate && modyule.startDate > tempCurrentModyule.startDate){
+                            tempCurrentModyule = modyule;
+                        }
+                    //this is the currentModyule
+                    myGlobals.currentModyule = tempCurrentModyule;
+                    this.selectedModyule = tempCurrentModyule;
+                    }
+                },
+                error =>  this.errorMessage = <any>error
+            );
     }
     
     onSelect(modyule: Modyule) { 
@@ -81,6 +82,16 @@ export class ModyuleComponent implements OnInit {
             return (mod.siteId === id);
             })[0];  //ie first [0] in returned array
 
+    }
+
+    private compareByModyuleName(modyuleA: Modyule,modyuleB: Modyule): number {
+        return modyuleA.name.localeCompare(modyuleB.name, undefined, {numeric: true, sensitivity: 'base'});  //sort function to naturally sort strings: http://stackoverflow.com/a/38641281/2235210
+    }
+
+    private compareByModyuleDate(modyuleA: Modyule,modyuleB: Modyule): number {
+            if(modyuleA.startDate<modyuleB.startDate) return -1;
+            if(modyuleA.startDate>modyuleB.startDate) return 1;
+            return 0;
     }
     
 }

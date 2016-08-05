@@ -15,34 +15,83 @@ var modyule_1 = require('./modyule');
 var week_service_1 = require('./week.service');
 var week_detail_component_1 = require('./week-detail.component');
 var WeekComponent = (function () {
-    //private _previousModyuleId: string;
-    function WeekComponent(
-        //private router: Router,
-        //private routeParams: RouteParams,
-        weekService) {
-        this.weekService = weekService;
-    }
-    WeekComponent.prototype.ngOnInit = function () {
-    };
-    WeekComponent.prototype.ngOnChanges = function (changes) {
+    function WeekComponent(weekService) {
         var _this = this;
-        //console.log(changes);
-        if (changes['modyule'] !== undefined) {
+        this.weekService = weekService;
+        this.updateWeek = function (newModyule) {
             var activeWeekSet = false;
             //go and get week data for this modyule
-            this.weekService.getWeeks(changes['modyule'].currentValue.siteUrl)
+            _this.weeksObservable = _this.weekService.getWeeks(newModyule.siteUrl)
+                .map(function (weeks) {
+                console.log(weeks);
+                return weeks;
+            })
                 .switchMap(function (weeks) { return _this.weekService.getWeeksDetails(weeks); })
-                .subscribe(function (weeks) {
-                _this.weeks = weeks;
-                for (var _i = 0, _a = _this.weeks; _i < _a.length; _i++) {
+                .map(function (weeks) {
+                //first sort them into name order
+                weeks.sort(_this.compareByWeekName);
+                _this.modyule.weeks = weeks;
+                var startDateOfThisWeek = new Date(_this.modyule.startDate.getTime()); //get date value not reference to original
+                for (var _i = 0, _a = _this.modyule.weeks; _i < _a.length; _i++) {
                     var week = _a[_i];
+                    var startDateOfNextWeek = new Date(startDateOfThisWeek.getTime());
+                    startDateOfNextWeek.setDate(startDateOfNextWeek.getDate() + 7);
+                    console.log(startDateOfThisWeek, startDateOfNextWeek);
                     var currentDate = new Date();
+                    if (currentDate >= startDateOfThisWeek && currentDate <= startDateOfNextWeek) {
+                        //this is the current Week
+                        week.active = true;
+                        activeWeekSet = true;
+                    }
+                    startDateOfThisWeek = startDateOfNextWeek;
                 }
                 if (!activeWeekSet) {
-                    _this.weeks[0].active = true;
+                    _this.modyule.weeks[0].active = true;
                 }
-            }, function (error) { return _this.errorMessage = error; });
+                return weeks;
+            })
+                .cache();
+            /*.subscribe(
+                weeks => {
+                    //first sort them into name order
+                    weeks.sort(this.compareByWeekName);
+                    this.modyule.weeks = weeks;
+                    let startDateOfThisWeek = new Date(this.modyule.startDate.getTime());  //get date value not reference to original
+                    for(var week of this.modyule.weeks){
+                        let startDateOfNextWeek: Date = new Date(startDateOfThisWeek.getTime());
+                        startDateOfNextWeek.setDate(startDateOfNextWeek.getDate() + 7);
+                        console.log(startDateOfThisWeek,startDateOfNextWeek);
+                        let currentDate: Date = new Date();
+                        if(currentDate >= startDateOfThisWeek && currentDate <= startDateOfNextWeek){
+                            //this is the current Week
+                            week.active = true;
+                            activeWeekSet = true;
+                        }
+                        startDateOfThisWeek = startDateOfNextWeek;
+                    }
+                    if(!activeWeekSet){
+                        this.modyule.weeks[0].active = true;
+                    }
+                },
+                error =>  this.errorMessage = <any>error
+            ); */
+        };
+    }
+    WeekComponent.prototype.ngOnInit = function () {
+        //this.updateWeek(this.modyule);
+    };
+    WeekComponent.prototype.ngOnChanges = function (changes) {
+        //console.log(changes);
+        if (changes['modyule'] !== undefined) {
+            //if(modyule !== undefined){  //as it will be when this is called at component init
+            var activeWeekSet = false;
+            //go and get week data for this modyule
+            //if(this.modyule.weeks === undefined || this.modyule.weeks.length == 0 ){  //only update if we don't already have the data
+            this.updateWeek(this.modyule);
         }
+    };
+    WeekComponent.prototype.compareByWeekName = function (weekA, weekB) {
+        return weekA.name.localeCompare(weekB.name, undefined, { numeric: true, sensitivity: 'base' }); //sort function to naturally sort strings: http://stackoverflow.com/a/38641281/2235210
     };
     __decorate([
         core_1.Input(), 

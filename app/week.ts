@@ -5,6 +5,7 @@ import { Seminar } from './seminar';
 export class Week {
     siteId: string;
     siteUrl: string;
+    lessonUrl: string;
     name: string;
     active: boolean;
     resourcesUrl: string;  //could be used to point to files in Resources

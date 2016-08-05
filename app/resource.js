@@ -1,12 +1,8 @@
 "use strict";
-/**
- * Represents a link off to a learning activity - possibly a lesson tool, an external URl or similar
- *
- */
-var Activity = (function () {
-    function Activity() {
+var Resource = (function () {
+    function Resource() {
     }
-    return Activity;
+    return Resource;
 }());
-exports.Activity = Activity;
+exports.Resource = Resource;
 //# sourceMappingURL=resource.js.map

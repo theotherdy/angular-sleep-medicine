@@ -10,7 +10,9 @@ import { Lecture } from './lecture';
 
 @Pipe({name: 'lectureType'})
 export class LectureTypePipe implements PipeTransform {
-    transform(allLectures: Lecture[], lectureType: string){
-        return allLectures.filter(lecture => lecture.type==lectureType);
+    transform(allLectures: Lecture[], lectureType: string): Lecture[]{
+        if(allLectures!==null){
+            return allLectures.filter(lecture => lecture.type==lectureType);
+        }
     }
 }

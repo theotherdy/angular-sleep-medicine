@@ -1,7 +1,12 @@
 <!--div class="hidden-xs" (click)="$event.preventDefault()"-->
 <div class="hidden-xs">
     <tabset [justified]="true" type="pills">
-        <tab *ngFor="let week of modyule.weeks"
+        <!--tab *ngFor="let week of modyule.weeks"
+            [heading]="week.name"
+            [active]="week.active"
+            (select)="week.active = true"
+            (deselect)="week.active = false"-->
+        <tab *ngFor="let week of (weeksObservable | async)"
             [heading]="week.name"
             [active]="week.active"
             (select)="week.active = true"
@@ -11,8 +16,8 @@
     </tabset>
 </div>
 <div class="visible-xs">
-    <div *ngFor="let week of modyule.weeks" class="panel panel-default">
-        <div class="panel-heading">
+    <div *ngFor="let week of (weeksObservable | async)" class="panel panel-default">
+            <div class="panel-heading">
             <div class="h2 text-center">{{week.name}}<br/><span class="h4">{{week.startDate | date:'d MMM'}} to {{week.endDate | date:'d MMM yy'}}</span></div>
         </div>
         <div class="panel-body">

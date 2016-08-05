@@ -18,7 +18,9 @@ var LectureTypePipe = (function () {
     function LectureTypePipe() {
     }
     LectureTypePipe.prototype.transform = function (allLectures, lectureType) {
-        return allLectures.filter(function (lecture) { return lecture.type == lectureType; });
+        if (allLectures !== null) {
+            return allLectures.filter(function (lecture) { return lecture.type == lectureType; });
+        }
     };
     LectureTypePipe = __decorate([
         core_1.Pipe({ name: 'lectureType' }), 
